@@ -25,7 +25,7 @@ jobs:
         uses: ParanoidParrot/qcost@fix/action-yml   # <-- CHANGE THIS REF
         with:
           db-type: postgres
-          fail-on-high: 'true'   # keep the PR green so you can read the comment
+          fail-on-high: 'false'   # keep the PR green so you can read the comment
           post-comment: 'true'
 
       # Proves the action's outputs are actually wired up.
