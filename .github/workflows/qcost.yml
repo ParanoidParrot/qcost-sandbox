@@ -1,0 +1,39 @@
+# Save in your throwaway test repo as: .github/workflows/qcost.yml
+#
+# IMPORTANT: change the `uses:` ref below to the branch you push your
+# action.yml fix to (e.g. @fix/action-yml). Once you tag v0.1.1,
+# change it to @v0.1.1 and re-run to confirm the tag resolves.
+
+name: QCost
+
+on:
+  pull_request:
+
+jobs:
+  query-cost:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write   # required — without this the comment POST 403s
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # required — qcost diffs against the base ref
+
+      - name: Run QCost
+        id: qcost
+        uses: ParanoidParrot/qcost@fix/action-yml   # <-- CHANGE THIS REF
+        with:
+          db-type: postgres
+          fail-on-high: 'false'   # keep the PR green so you can read the comment
+          post-comment: 'true'
+
+      # Proves the action's outputs are actually wired up.
+      # Before the action.yml fix these were empty strings.
+      - name: Show outputs
+        if: always()
+        run: |
+          echo "total-score = '${{ steps.qcost.outputs.total-score }}'"
+          echo "gate-passed = '${{ steps.qcost.outputs.gate-passed }}'"
+          echo "--- report ---"
+          echo "${{ steps.qcost.outputs.report }}"
